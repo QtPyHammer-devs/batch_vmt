@@ -1,0 +1,7 @@
+"LightmappedGeneric"
+{
+	"$basetexture" "minecraft/glass/clear"
+	"$surfaceprop" "glass"
+	"$alphatest" "1"
+	"%keywords" "minecraft"
+}

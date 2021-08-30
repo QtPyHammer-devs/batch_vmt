@@ -1,0 +1,7 @@
+"LightmappedGeneric"
+{
+	"$basetexture" "minecraft/wood/chest_top"
+	"$surfaceprop" "wood"
+	"$alphatest" "1"
+	"%keywords" "minecraft"
+}

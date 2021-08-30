@@ -1,0 +1,7 @@
+"LightmappedGeneric"
+{
+	"$basetexture" "minecraft/foliage/cactus_slice"
+	"$surfaceprop" "grass"
+	"$transparent" "1"
+	"%keywords" "minecraft"
+}

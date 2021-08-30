@@ -1,0 +1,6 @@
+"LightmappedGeneric"
+{
+	"$basetexture" "minecraft/stone/cobble"
+	"$surfaceprop" "rock"
+	"%keywords" "minecraft"
+}
