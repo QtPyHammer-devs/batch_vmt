@@ -1,7 +1,7 @@
 # batch_vmt
 batch .vmt generator (WIP)
 
-# Installation
+## Installation
 Clone this repo:  
 
 ```
@@ -22,7 +22,7 @@ Run the Gooey GUI
 python batch_vmt.py
 ```
 
-# Not Yet Implemented
+## Not Yet Implemented
   * Metadata Parsing (Use --template mode instead!)
     - VTF reader (will copy over the QtPyHammer vtf classes later)
   * PyInstaller standalone .exe builds (coming soonTM)
