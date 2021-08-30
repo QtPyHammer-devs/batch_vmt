@@ -1,7 +1,0 @@
-"LightmappedGeneric"
-{
-	"$basetexture" "minecraft/wood/dark_oak/planks"
-	"$surfaceprop" "wood"
-	"$alphatest" "1"
-	"%keywords" "minecraft"
-}

@@ -1,4 +1,6 @@
 "LightmappedGeneric"
 {
-	"$basetexture" "<texture>"
+	"$basetexture" "tests/materials\6_2"
+
+	"%keywords" "final_test"
 }

@@ -1,4 +1,6 @@
 "LightmappedGeneric"
 {
-	"$basetexture" "<texture>"
+	"$basetexture" "tests/materials\shulker_box_light_grey"
+
+	"%keywords" "final_test"
 }

@@ -1,4 +1,6 @@
 "LightmappedGeneric"
 {
-	"$basetexture" "<texture>"
+	"$basetexture" "tests/materials\redstone_torch_on"
+
+	"%keywords" "final_test"
 }

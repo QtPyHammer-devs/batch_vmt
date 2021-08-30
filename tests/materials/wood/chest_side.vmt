@@ -1,7 +1,0 @@
-"LightmappedGeneric"
-{
-	"$basetexture" "minecraft/wood/chest_side"
-	"$surfaceprop" "wood"
-	"$transparent" "1"
-	"%keywords" "minecraft"
-}
