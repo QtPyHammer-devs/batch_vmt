@@ -3,8 +3,9 @@ batch .vmt generator (WIP)
 
 Uses [VTFLibWrapper by Ganonmaster](https://github.com/Ganonmaster/VTFLibWrapper),
 which provides python bindings for [Nem's VTFLib](https://web.archive.org/web/20191229074421/http://nemesis.thewavelength.net/index.php?p=40)
-(also used by the [SourceIO](https://github.com/REDxEYE/SourceIO/tree/master/source1/vtf/VTFWrapper) blender addon)  
+(also used by the [SourceIO](https://github.com/REDxEYE/SourceIO/tree/master/source1/vtf/VTFWrapper) blender addon)   
 See also: [VTFCmd](https://github.com/TitusStudiosMediaGroup/VTFcmd-Resources)
+<!-- reVaMpT; community tool or proprietary? -->
 
 ## Installation
 Clone this repo:  
