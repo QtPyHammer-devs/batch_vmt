@@ -1,0 +1,16 @@
+WorldVertexTransition
+{
+    // generated with batch_vmt.py
+
+    // Primary Texture
+    "$basetexture" "<texture>"
+    "$bumpmap" "<texture>_bump"
+    // $surfaceprop <surfaceprop>
+
+    // Secondary Texture
+    "$basetexture2" "<texture>a"
+    "$bumpmap2" "<texture>a_bump"
+    // $surfaceprop2 <surfaceprop2>
+
+    "%tooltexture" "<texture>_editor"
+}
