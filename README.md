@@ -17,7 +17,7 @@ Install dependencies with pip
 
 ```
 py -3.9 -m venv venv
-venv/scripts/activate
+call venv/scripts/activate
 python -m pip --upgrade pip
 python -m pip install -r requirements.txt
 ```
