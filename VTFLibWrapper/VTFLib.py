@@ -1,56 +1,73 @@
+import _ctypes
+import ctypes
 import os
 import platform
 import sys
 from ctypes import *
 
-try:
-    from VTFWrapper.VTFLibEnums import ImageFlag
-    import VTFLibEnums
-    import VTFLibConstants
-    import VTFLibStructures
-except Exception:
-    from .VTFLibEnums import ImageFlag
-    from . import (VTFLibEnums,
-                   VTFLibStructures,
-                   VTFLibConstants)
+from . import VTFLibEnums, VTFLibStructures
 
 platform_name = platform.system()
-full_path = os.path.join(os.path.dirname(__file__), 'bin')
+
+
+class UnsupportedOS(Exception):
+    pass
+
 
 if platform_name == "Windows":
     is64bit = platform.architecture(executable=sys.executable,
                                     bits='',
                                     linkage='')[0] == "64bit"
     vtf_lib_name = "VTFLib.x64.dll" if is64bit else "VTFLib.x86.dll"
-    vtf_lib_name = os.path.join(full_path, vtf_lib_name)
+    full_path = os.path.dirname(__file__)
 elif platform_name == "Linux":
     # On linux we assume this lib is in a predictable location
     # VTFLib Linux: https://github.com/panzi/VTFLib
     # requires: libtxc_dxtn
-    dxtn_lib_name = os.path.join(full_path, "libtxc_dxtn.so")
-    vtf_lib_name = os.path.join(full_path, "libVTFLib13.so")
+    full_path = os.path.dirname(__file__)
+    vtf_lib_name = "libVTFLib13.so"
+elif platform_name == 'Darwin':
+    full_path = os.path.dirname(__file__)
+    vtf_lib_name = "libvtf.dylib"
+
 else:
-    raise NotImplementedError()
+    raise UnsupportedOS(f"{platform_name} is not supported")
+
 
 # TODO: move to util?
-
 
 def pointer_to_array(poiter, size, type=c_ubyte):
     return cast(poiter, POINTER(type * size))
 
 
 class VTFLib:
-    if platform.system() == "Windows":
+    vtflib_cdll: ctypes.CDLL = None
+    if platform_name == "Windows":
         vtflib_cdll = WinDLL(os.path.join(full_path, vtf_lib_name))
-    elif platform.system() == "Linux":
-        dxtn_cdll = cdll.LoadLibrary(dxtn_lib_name)
-        vtflib_cdll = cdll.LoadLibrary(vtf_lib_name)
+    elif platform_name == "Linux":
+        vtflib_cdll = cdll.LoadLibrary(os.path.join(full_path, vtf_lib_name))
+    elif platform_name == 'Darwin':  # Thanks to Teodoso Lujan who compiled me a version of VTFLib
+        vtflib_cdll = cdll.LoadLibrary(os.path.join(full_path, vtf_lib_name))
+    else:
+        raise NotImplementedError("Platform {} isn't supported".format(platform_name))
 
     def __init__(self):
+        self.load_dll()
         self.initialize()
         self.image_buffer = c_int()
         self.create_image(byref(self.image_buffer))
         self.bind_image(self.image_buffer)
+
+    @classmethod
+    def load_dll(cls):
+        if platform_name == "Windows":
+            cls.vtflib_cdll = WinDLL(os.path.join(full_path, vtf_lib_name))
+        elif platform_name == "Linux":
+            cls.vtflib_cdll = cdll.LoadLibrary(os.path.join(full_path, vtf_lib_name))
+        elif platform_name == 'Darwin':  # Thanks to Teodoso Lujan who compiled me a version of VTFLib
+            cls.vtflib_cdll = cdll.LoadLibrary(os.path.join(full_path, vtf_lib_name))
+        else:
+            raise NotImplementedError("Platform {} isn't supported".format(platform_name))
 
     GetVersion = vtflib_cdll.vlGetVersion
     GetVersion.argtypes = []
@@ -85,7 +102,6 @@ class VTFLib:
     GetLastError.restype = c_char_p
 
     def get_last_error(self):
-        bytes().decode()
         error = self.GetLastError().decode('utf', "replace")
         return error if error else "No errors"
 
@@ -209,7 +225,15 @@ class VTFLib:
 
     def image_load(self, filename, header_only=False):
         return self.ImageLoad(create_string_buffer(
-            filename.encode('ascii')), header_only)
+            str(filename).encode('ascii')), header_only)
+
+    ImageLoadBuffer = vtflib_cdll.vlImageLoadLump
+    ImageLoadBuffer.argtypes = [c_void_p, c_uint32, c_bool]
+    ImageLoadBuffer.restype = c_bool
+
+    def image_load_from_buffer(self, buffer, header_only=False):
+        c_buffer = create_string_buffer(buffer)
+        return self.ImageLoadBuffer(c_buffer, len(buffer), header_only)
 
     ImageSave = vtflib_cdll.vlImageSave
     ImageSave.argtypes = [c_char_p]
@@ -286,7 +310,7 @@ class VTFLib:
     ImageGetFlags.restype = c_int32
 
     def get_image_flags(self):
-        return ImageFlag(self.ImageGetFlags())
+        return VTFLibEnums.ImageFlag(self.ImageGetFlags())
 
     ImageSetFlags = vtflib_cdll.vlImageSetFlags
     ImageSetFlags.argtypes = [c_float]
@@ -493,7 +517,7 @@ class VTFLib:
     def convert_to_rgba8888(self):
         new_size = self.compute_image_size(self.width(), self.height(), self.depth(), self.mipmap_count(),
                                            VTFLibEnums.ImageFormat.ImageFormatRGBA8888)
-        new_buffer = cast(create_string_buffer(init=new_size), POINTER(c_byte))
+        new_buffer = cast(create_string_buffer(new_size), POINTER(c_byte))
         if not self.ImageConvertToRGBA8888(self.ImageGetData(0, 0, 0, 0), new_buffer, self.width(), self.height(),
                                            self.image_format().value):
             return pointer_to_array(new_buffer, new_size)
@@ -547,15 +571,3 @@ class VTFLib:
 
     def set_proc(self, proc, value):
         self.SetProc(proc, value)
-
-
-if __name__ == '__main__':
-    a = VTFLib()
-    print(a.create_default_params_structure())
-    # a.image_load(
-    #     r"G:\SteamLibrary\SteamApps\common\SourceFilmmaker\game\usermod\materials\models\skuddbutt\mavis\body_clothed.vtf",
-    #     False)
-    print(a.image_format())
-    # print(a.get_image_flags()).get_flag(ImageFlag.ImageFlagBorder)
-    # a.image_save("G:\\SteamLibrary\\SteamApps\\common\\SourceFilmmaker\\game\\usermod\\materials\\models\\Red_eye\\Endless\\Feline\\Body2.vtf")
-    print(a.get_last_error())
