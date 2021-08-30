@@ -20,18 +20,11 @@ from gooey import Gooey, GooeyParser
 __version__ = "1.0.0"
 
 
-def from_template(vtf_filename: str, template: str, **substitutions: Dict[str, str]):
+def from_template(vtf_filename: str, template: str, substitutions: Dict[str, str] = dict()):
     """Generate .vmts from `template` for every .vtf in `folder`"""
-    # example usage:
-    # from_template("LightmappedGeneric{$basetexture <filename>}", "materials/folder")
-    # from_template(open("template.vmt").read(), "materials/folder", surfaceprop="metal")
     for keyword, replacement in substitutions.items():
         template = template.replace(f"<{keyword}>", replacement)
-        # e.g. replacements = {"texture2": "<filename>a"}
-        # '$basetexture2 <blend_texture>' --> '"$basetexture2" "<filename>_a"'
-        # then at the file level: '<filename>_a' -> 'texture_a' for "texture.vmt"
-    # NOTE: never put filename in replacements unless you want to replace all textures with one texture!
-    filename = os.path.splitext(vtf_filename)[0]  # remove .vtf extension
+    filename = os.path.splitext(vtf_filename)[0]
     with open(f"{filename}.vmt", "w") as vmt_file:
         vmt_file.write(template.replace("<filename>", filename))
 
@@ -42,13 +35,8 @@ def from_metadata(vtf_filename: str, shader: str = "LightmappedGeneric",
                   defaults={"colour": ("%keywords", "white")}):
     """generate an appropriate .vmt from .vmt flags"""
     raise NotImplementedError()
-    # * EXPECTED FLAGS *
-    # has_alpha: bool   // vtf is transparent e.g. {"has_alpha": "$translucent": 1}
-    # colour: Color     // fuzzy colour detection
-    # hue_range: float  // [0-1]; how close the texture's hue should be to colour
 
     filename = os.path.splitext(vtf_filename)[0]
-
     vtf = ...  # TODO: load f"{filename}.vtf" with VTFLibWrapper
     # check flags
     check: Dict[str, bool]
